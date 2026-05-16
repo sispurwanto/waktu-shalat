@@ -24,7 +24,7 @@ class IqomahTimerView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Menuju Iqomah',
+              prayerName == 'Syuruq' ? 'Waktu Tunggu' : 'Menuju Iqomah',
               style: TextStyle(
                 fontSize: 48,
                 color: Colors.amber[700],
@@ -43,7 +43,7 @@ class IqomahTimerView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Shalat $prayerName',
+              prayerName == 'Syuruq' ? prayerName : 'Shalat $prayerName',
               style: const TextStyle(fontSize: 48, color: Colors.white),
             ),
           ],

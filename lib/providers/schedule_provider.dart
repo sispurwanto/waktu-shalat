@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:hijri/hijri_calendar.dart';
 
 import 'data_provider.dart';
+import '../models/models.dart';
 
 enum AppMode { defaultView, iqomahTimer, prayerTime }
 
@@ -23,13 +24,30 @@ class ScheduleProvider with ChangeNotifier {
   String? _currentPrayerName;
 
   int _iqomahSecondsRemaining = 0;
+  IqomahConfig? _currentIqomahConfig;
   DateTime? _prayerStateEndTime;
 
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  AudioPlayer? _audioPlayer;
 
   ScheduleProvider(this.dataProvider) {
+    try {
+      _audioPlayer = AudioPlayer();
+    } catch (e) {
+      debugPrint('[ScheduleProvider] AudioPlayer init error: $e');
+    }
     _initPrayerTimes();
     _startTicker();
+  }
+
+  // Update logic when DataProvider changes (from ProxyProvider)
+  void updateFromDataProvider(DataProvider newData) {
+    // If coordinates changed, re-init prayer times
+    if (newData.config.latitude != dataProvider.config.latitude ||
+        newData.config.longitude != dataProvider.config.longitude) {
+      debugPrint('[ScheduleProvider] Location updated from Firebase, re-initializing...');
+      _initPrayerTimes();
+    }
+    notifyListeners();
   }
 
   AppMode get currentMode => _currentMode;
@@ -83,7 +101,7 @@ class ScheduleProvider with ChangeNotifier {
   @override
   void dispose() {
     _ticker?.cancel();
-    _audioPlayer.dispose();
+    _audioPlayer?.dispose();
     super.dispose();
   }
 
@@ -137,6 +155,15 @@ class ScheduleProvider with ChangeNotifier {
       if (nextTime != null && _nextPrayer != null) {
         if (_currentTime.isAfter(nextTime) ||
             _currentTime.isAtSameMomentAs(nextTime)) {
+          
+          // Syuruq does not have iqomah or prayer view
+          if (_nextPrayer == Prayer.sunrise) {
+            debugPrint('[ScheduleProvider] Syuruq time reached, skipping transition.');
+            _updateNextPrayer(); // Just move to the next prayer (Dhuhr)
+            notifyListeners();
+            return;
+          }
+
           // It is prayer time!
           _transitionToIqomah(_nextPrayer!);
         }
@@ -158,7 +185,32 @@ class ScheduleProvider with ChangeNotifier {
   void _transitionToIqomah(Prayer prayer) {
     _currentMode = AppMode.iqomahTimer;
     _currentPrayerName = _getPrayerName(prayer);
-    _iqomahSecondsRemaining = dataProvider.config.iqomahDurationMinutes * 60;
+
+    // Get per-prayer iqomah config
+    final config = dataProvider.config;
+    IqomahConfig iqomahConfig;
+    switch (prayer) {
+      case Prayer.fajr:
+        iqomahConfig = config.subuhConfig;
+        break;
+      case Prayer.dhuhr:
+        iqomahConfig = config.dzuhurConfig;
+        break;
+      case Prayer.asr:
+        iqomahConfig = config.asharConfig;
+        break;
+      case Prayer.maghrib:
+        iqomahConfig = config.maghribConfig;
+        break;
+      case Prayer.isha:
+        iqomahConfig = config.isyaConfig;
+        break;
+      default:
+        iqomahConfig = IqomahConfig.defaultConfig();
+    }
+
+    _iqomahSecondsRemaining = iqomahConfig.waktuIqomah * 60;
+    _currentIqomahConfig = iqomahConfig;
 
     // Just in case we need to calculate next prayer after this
     _updateNextPrayer();
@@ -170,24 +222,14 @@ class ScheduleProvider with ChangeNotifier {
 
     // Play beep 3 times
     try {
-      // Assuming we have a beep sound in assets/sounds/beep.mp3
-      // We'll call it 3 times with delays if it's short, or just play a combined asset.
-      // For now we'll just try to play it once, or loop it 3 times.
-      await _audioPlayer.play(AssetSource('sounds/beep.mp3'));
-      // A simple approach is to rely on an asset that already has 3 beeps,
-      // or we can programmatically play it 3 times here.
-      // E.g.:
-      // for(int i=0; i<2; i++) {
-      //   await Future.delayed(Duration(seconds: 1));
-      //   await _audioPlayer.play(AssetSource('sounds/beep.mp3'));
-      // }
+      await _audioPlayer?.play(AssetSource('sounds/beep.mp3'));
     } catch (e) {
       debugPrint("Error playing beep: $e");
     }
 
-    _prayerStateEndTime = _currentTime.add(
-      Duration(minutes: dataProvider.config.prayerDurationMinutes),
-    );
+    final prayerMinutes =
+        _currentIqomahConfig?.waktuShalat ?? 15;
+    _prayerStateEndTime = _currentTime.add(Duration(minutes: prayerMinutes));
     notifyListeners();
   }
 

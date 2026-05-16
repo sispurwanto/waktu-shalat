@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -6,8 +7,58 @@ import 'package:adhan/adhan.dart';
 import '../providers/data_provider.dart';
 import '../providers/schedule_provider.dart';
 
-class DefaultView extends StatelessWidget {
+class DefaultView extends StatefulWidget {
   const DefaultView({super.key});
+
+  @override
+  State<DefaultView> createState() => _DefaultViewState();
+}
+
+class _DefaultViewState extends State<DefaultView> {
+  int _adviceIndex = 0;
+  int _infoIndex = 0;
+  Timer? _adviceTimer;
+  Timer? _infoTimer;
+
+  static const int _itemRotationSeconds = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimers();
+  }
+
+  void _startTimers() {
+    _adviceTimer = Timer.periodic(
+      const Duration(seconds: _itemRotationSeconds),
+      (_) {
+        final dp = Provider.of<DataProvider>(context, listen: false);
+        if (dp.advices.isNotEmpty) {
+          setState(() {
+            _adviceIndex = (_adviceIndex + 1) % dp.advices.length;
+          });
+        }
+      },
+    );
+    _infoTimer = Timer.periodic(
+      const Duration(seconds: _itemRotationSeconds),
+      (_) {
+        final dp = Provider.of<DataProvider>(context, listen: false);
+        if (dp.mosqueInfos.isNotEmpty) {
+          setState(() {
+            _infoIndex = (_infoIndex + 1) % dp.mosqueInfos.length;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _adviceTimer?.cancel();
+    _infoTimer?.cancel();
+    super.dispose();
+  }
 
   String _getPrayerName(Prayer? prayer) {
     switch (prayer) {
@@ -33,49 +84,57 @@ class DefaultView extends StatelessWidget {
     final scheduleProvider = Provider.of<ScheduleProvider>(context);
     final dataProvider = Provider.of<DataProvider>(context);
 
+    // Clamp indices in case data changes from Firestore
+    final adviceIdx = dataProvider.advices.isNotEmpty
+        ? _adviceIndex % dataProvider.advices.length
+        : 0;
+    final infoIdx = dataProvider.mosqueInfos.isNotEmpty
+        ? _infoIndex % dataProvider.mosqueInfos.length
+        : 0;
+
     return Column(
       children: [
-        // Header Time
+
+        // ── Header ──────────────────────────────────────────────────
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4), // Minimized from 8
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Left: Mosque name & location
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     dataProvider.config.mosqueName,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 32, // Reduced from 42
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     dataProvider.config.mosqueLocation,
-                    style: const TextStyle(fontSize: 20, color: Colors.white70),
+                    style: const TextStyle(fontSize: 18, color: Colors.white70), // Reduced from 24
                   ),
                 ],
               ),
+              // Right: Clock & date
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${scheduleProvider.formattedCurrentTime}',
+                    scheduleProvider.formattedCurrentTime,
                     style: const TextStyle(
-                      fontSize: 28,
+                      fontSize: 34, // Reduced from 40
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   Text(
                     '${scheduleProvider.formattedCurrentDate} | ${scheduleProvider.formattedHijriDate}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.greenAccent,
-                    ),
+                    style: const TextStyle(fontSize: 18, color: Colors.greenAccent), // Reduced from 22
                   ),
                 ],
               ),
@@ -83,74 +142,99 @@ class DefaultView extends StatelessWidget {
           ),
         ),
 
-        // Main Content (Carousel of Advices and Info)
-        Expanded(child: _buildCarousel(dataProvider)),
+        // ── Main Carousel (Advice ↔ Info Masjid) ────────────────────
+        Expanded(
+          child: _buildCarousel(dataProvider, adviceIdx, infoIdx),
+        ),
 
-        // Footer Prayer Schedule
+        // ── Footer: Countdown + Prayer Schedule ─────────────────────
         _buildFooterSchedule(scheduleProvider),
       ],
     );
   }
 
-  Widget _buildCarousel(DataProvider dataProvider) {
-    List<Widget> carouselItems = [];
+  Widget _buildCarousel(DataProvider dataProvider, int adviceIdx, int infoIdx) {
+    final slideMinutes = dataProvider.config.slideIntervalMinutes;
 
-    for (var advice in dataProvider.advices) {
-      carouselItems.add(
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: SingleChildScrollView(
-              child: Text(
-                advice.text,
+    // Build two slides: one for Advice, one for MosqueInfo
+    final List<Widget> slides = [];
+
+    // Slide 1: Nasehat
+    if (dataProvider.advices.isNotEmpty) {
+      final advice = dataProvider.advices[adviceIdx];
+      slides.add(
+        _CarouselSlide(
+          key: ValueKey('advice_$adviceIdx'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                advice.isi,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 36,
+                  fontSize: 32, // Further reduced
                   fontStyle: FontStyle.italic,
                   color: Colors.white,
+                  height: 1.4,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    for (var info in dataProvider.mosqueInfos) {
-      carouselItems.add(
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    info.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    info.content,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 32, color: Colors.white),
-                  ),
-                ],
+              const SizedBox(height: 16),
+              Text(
+                '— ${advice.dalil}',
+                style: const TextStyle(
+                  fontSize: 22, // Further reduced
+                  color: Colors.amber,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
+            ],
           ),
         ),
       );
     }
 
-    if (carouselItems.isEmpty) {
-      return const Center(child: Text("Tidak ada informasi saat ini."));
+    // Slide 2: Info Masjid
+    if (dataProvider.mosqueInfos.isNotEmpty) {
+      final info = dataProvider.mosqueInfos[infoIdx];
+      slides.add(
+        _CarouselSlide(
+          key: ValueKey('info_$infoIdx'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                info.title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 42, // Further reduced
+                  fontWeight: FontWeight.w900,
+                  color: Colors.amber,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                info.content,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 30, // Further reduced
+                  color: Colors.white,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (slides.isEmpty) {
+      return const Center(
+        child: Text('Tidak ada informasi saat ini.',
+            style: TextStyle(color: Colors.white70)),
+      );
     }
 
     return Container(
@@ -164,13 +248,11 @@ class DefaultView extends StatelessWidget {
       child: CarouselSlider(
         options: CarouselOptions(
           autoPlay: true,
-          autoPlayInterval: Duration(
-            minutes: dataProvider.config.slideIntervalMinutes,
-          ),
+          autoPlayInterval: Duration(minutes: slideMinutes),
           viewportFraction: 1.0,
           height: double.infinity,
         ),
-        items: carouselItems,
+        items: slides,
       ),
     );
   }
@@ -191,24 +273,28 @@ class DefaultView extends StatelessWidget {
         final hours = diff.inHours.toString().padLeft(2, '0');
         final minutes = (diff.inMinutes % 60).toString().padLeft(2, '0');
         final seconds = (diff.inSeconds % 60).toString().padLeft(2, '0');
-        String nextName = _getPrayerName(scheduleProvider.nextPrayer);
-        countdownText = '$hours:$minutes:$seconds menuju shalat $nextName';
+        final nextName = _getPrayerName(scheduleProvider.nextPrayer);
+        if (nextName == 'Syuruq') {
+          countdownText = '$hours:$minutes:$seconds menuju $nextName';
+        } else {
+          countdownText = '$hours:$minutes:$seconds menuju shalat $nextName';
+        }
       }
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      color: const Color(0xFF092920), // Darker green for footer
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10), // Minimized from 6
+      color: const Color(0xFF092920),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (countdownText.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 4),
               child: Text(
                 countdownText,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 24, // Reduced from 28
                   fontWeight: FontWeight.bold,
                   color: Colors.amber,
                 ),
@@ -255,6 +341,27 @@ class DefaultView extends StatelessWidget {
   }
 }
 
+// ── Helper: Carousel slide with AnimatedSwitcher ──────────────────────────────
+class _CarouselSlide extends StatelessWidget {
+  final Widget child;
+
+  const _CarouselSlide({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20), // Adjusted
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 600),
+          child: SingleChildScrollView(key: key, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Schedule Item in footer ────────────────────────────────────────────────────
 class _ScheduleItem extends StatelessWidget {
   final String name;
   final String time;
@@ -266,8 +373,8 @@ class _ScheduleItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.all(10),
-      width: isNext ? 130 : 110, // slightly wider if active
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8), // Reduced from 10
+      width: isNext ? 120 : 100, // Reduced from 130/110
       decoration: BoxDecoration(
         color: isNext ? Colors.amber[400] : const Color(0xFF144D3E),
         borderRadius: BorderRadius.circular(15),
@@ -278,7 +385,7 @@ class _ScheduleItem extends StatelessWidget {
         boxShadow: isNext
             ? [
                 BoxShadow(
-                  color: Colors.amber.withOpacity(0.6),
+                  color: Colors.amber.withValues(alpha: 0.6),
                   blurRadius: 15,
                   spreadRadius: 5,
                 ),
@@ -291,16 +398,16 @@ class _ScheduleItem extends StatelessWidget {
           Text(
             name,
             style: TextStyle(
-              fontSize: isNext ? 22 : 18,
+              fontSize: isNext ? 18 : 14, // Reduced from 20/16
               fontWeight: FontWeight.bold,
               color: isNext ? Colors.black : Colors.white,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 2), // Reduced from 5
           Text(
             time,
             style: TextStyle(
-              fontSize: isNext ? 26 : 22,
+              fontSize: isNext ? 22 : 18, // Reduced from 24/20
               fontWeight: FontWeight.w600,
               color: isNext ? Colors.black : Colors.green[100],
             ),

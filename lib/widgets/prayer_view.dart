@@ -17,7 +17,7 @@ class PrayerView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Shalat $prayerName',
+              prayerName == 'Syuruq' ? 'Waktu $prayerName' : 'Shalat $prayerName',
               style: const TextStyle(
                 fontSize: 120,
                 color: Colors.white,
