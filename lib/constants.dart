@@ -5,6 +5,7 @@ class AppConstants {
   static const String defaultMasjidId = 'al_muhajirin_yiami';
   static const String defaultMosqueName = 'Mushola Al Muhajirin Yiami';
   static const String defaultMosqueLocation = 'Cileungsi - Bogor';
+  static const String defaultBackgroundPath = 'assets/images/bg_masjid.jpg';
   
   // --- Koordinat (Penting untuk perhitungan waktu shalat) ---
   static const double defaultLatitude = -6.4023;

@@ -34,6 +34,7 @@ class FirebaseService {
 
   // Stream the full masjid document for real-time updates
   Stream<DocumentSnapshot<Map<String, dynamic>>> masjidStream() {
+    debugPrint('[FirebaseService] Listening to document: $_collectionPath/$_masjidId');
     try {
       // Accessing instance will throw if not initialized
       return _firestore

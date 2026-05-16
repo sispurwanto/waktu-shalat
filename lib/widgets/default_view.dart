@@ -238,11 +238,13 @@ class _DefaultViewState extends State<DefaultView> {
     }
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/bg_masjid.jpg'),
+          image: dataProvider.config.backgroundUrl.startsWith('http')
+              ? NetworkImage(dataProvider.config.backgroundUrl) as ImageProvider
+              : AssetImage(dataProvider.config.backgroundUrl),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
+          colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
         ),
       ),
       child: CarouselSlider(

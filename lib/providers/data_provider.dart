@@ -56,7 +56,7 @@ class DataProvider with ChangeNotifier {
         (snapshot) {
           if (snapshot.exists && snapshot.data() != null) {
             final data = snapshot.data()!;
-            debugPrint('[DataProvider] Firestore data received.');
+            debugPrint('[DataProvider] Firestore data received from: ${snapshot.reference.path}');
             _config = _firebaseService.parseConfig(data);
             final firestoreAdvices = _firebaseService.parseAdvices(data);
             final firestoreInfos = _firebaseService.parseMosqueInfos(data);
@@ -68,7 +68,7 @@ class DataProvider with ChangeNotifier {
                 : List.from(_defaultMosqueInfos);
             _isUsingFirebase = true;
           } else {
-            debugPrint('[DataProvider] Firestore doc empty — using local data.');
+            debugPrint('[DataProvider] WARNING: Document NOT FOUND at path: ${snapshot.reference.path}');
             _isUsingFirebase = false;
           }
           notifyListeners();

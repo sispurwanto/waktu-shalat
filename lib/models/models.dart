@@ -64,6 +64,7 @@ class IqomahConfig {
 class AppConfig {
   final String mosqueName;
   final String mosqueLocation;
+  final String backgroundUrl;
   final int slideIntervalMinutes;
   final double latitude;
   final double longitude;
@@ -76,6 +77,7 @@ class AppConfig {
   AppConfig({
     required this.mosqueName,
     required this.mosqueLocation,
+    required this.backgroundUrl,
     required this.slideIntervalMinutes,
     required this.latitude,
     required this.longitude,
@@ -90,6 +92,7 @@ class AppConfig {
     return AppConfig(
       mosqueName: AppConstants.defaultMosqueName,
       mosqueLocation: AppConstants.defaultMosqueLocation,
+      backgroundUrl: AppConstants.defaultBackgroundPath,
       slideIntervalMinutes: AppConstants.defaultSlideIntervalMinutes,
       latitude: AppConstants.defaultLatitude,
       longitude: AppConstants.defaultLongitude,
@@ -115,9 +118,15 @@ class AppConfig {
 
   factory AppConfig.fromMap(Map<String, dynamic> map) {
     final iqomah = map['iqomah'] as Map<String, dynamic>? ?? {};
+    String bgUrl = map['background_url']?.toString() ?? '';
+    if (bgUrl.isEmpty || bgUrl == '-') {
+      bgUrl = AppConstants.defaultBackgroundPath;
+    }
+
     return AppConfig(
       mosqueName: map['nama'] ?? AppConstants.defaultMosqueName,
       mosqueLocation: map['lokasi'] ?? AppConstants.defaultMosqueLocation,
+      backgroundUrl: bgUrl,
       slideIntervalMinutes:
           _parseNum(map['durasi_slide'])?.toInt() ?? AppConstants.defaultSlideIntervalMinutes,
       latitude: _parseNum(map['latitude'])?.toDouble() ?? AppConstants.defaultLatitude,
