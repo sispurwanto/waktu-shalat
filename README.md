@@ -27,3 +27,12 @@ Spesifikasi APP:
   - IqomahTimer
   - PrayerView
 
+### run dan build
+```bash
+flutter run --dart-define=MASJID_ID={MASJID_ID}
+flutter build apk --target-platform android-arm64 --dart-define=MASJID_ID={MASJID_ID}
+
+flutter build appbundle --target-platform android-arm64 --dart-define=MASJID_ID={MASJID_ID}
+flutter build appbundle --release --target-platform android-arm64 --dart-define=MASJID_ID={MASJID_ID}
+```
+
