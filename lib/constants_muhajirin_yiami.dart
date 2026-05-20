@@ -58,7 +58,7 @@ class AppConstants {
     },
     {
       "id": "6",
-      "dalil": "QS. Al-Mu\'minun: 1–2",
+      "dalil": "QS. Al-Mu'minun: 1–2",
       "isi": "Beruntunglah orang-orang yang khusyuk dalam shalatnya.",
     },
     {
@@ -69,12 +69,12 @@ class AppConstants {
     },
     {
       "id": "8",
-      "dalil": "QS. Ar-Ra\'d: 28",
+      "dalil": "QS. Ar-Ra'd: 28",
       "isi": "Dengan mengingat Allah hati menjadi tenteram.",
     },
     {
       "id": "9",
-      "dalil": "QS. Al-Ma\'un: 4–5",
+      "dalil": "QS. Al-Ma'un: 4–5",
       "isi": "Maka celakalah orang-orang yang lalai dari shalatnya",
     },
     {
