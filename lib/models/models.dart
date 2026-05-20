@@ -4,14 +4,21 @@ class Advice {
   final String id;
   final String dalil;
   final String isi;
+  final String? urlSlide;
 
-  Advice({required this.id, required this.dalil, required this.isi});
+  Advice({
+    required this.id,
+    required this.dalil,
+    required this.isi,
+    this.urlSlide,
+  });
 
   factory Advice.fromMap(Map<String, dynamic> map, String id) {
     return Advice(
       id: id,
       dalil: map['dalil'] ?? '',
       isi: map['isi'] ?? '',
+      urlSlide: map['url_slide']?.toString(),
     );
   }
 }
@@ -20,14 +27,21 @@ class MosqueInfo {
   final String id;
   final String title;
   final String content;
+  final String? urlSlide;
 
-  MosqueInfo({required this.id, required this.title, required this.content});
+  MosqueInfo({
+    required this.id,
+    required this.title,
+    required this.content,
+    this.urlSlide,
+  });
 
   factory MosqueInfo.fromMap(Map<String, dynamic> map, String id) {
     return MosqueInfo(
       id: id,
       title: map['title'] ?? '',
       content: map['content'] ?? '',
+      urlSlide: map['url_slide']?.toString(),
     );
   }
 }

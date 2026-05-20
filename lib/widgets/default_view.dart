@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:adhan/adhan.dart';
 import '../providers/data_provider.dart';
 import '../providers/schedule_provider.dart';
+import '../constants.dart';
 
 class DefaultView extends StatefulWidget {
   const DefaultView({super.key});
@@ -165,6 +166,7 @@ class _DefaultViewState extends State<DefaultView> {
       slides.add(
         _CarouselSlide(
           key: ValueKey('advice_$adviceIdx'),
+          backgroundUrl: advice.urlSlide,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -201,6 +203,7 @@ class _DefaultViewState extends State<DefaultView> {
       slides.add(
         _CarouselSlide(
           key: ValueKey('info_$infoIdx'),
+          backgroundUrl: info.urlSlide,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -237,25 +240,14 @@ class _DefaultViewState extends State<DefaultView> {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: dataProvider.config.backgroundUrl.startsWith('http')
-              ? NetworkImage(dataProvider.config.backgroundUrl) as ImageProvider
-              : AssetImage(dataProvider.config.backgroundUrl),
-          fit: BoxFit.cover,
-          colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
-        ),
+    return CarouselSlider(
+      options: CarouselOptions(
+        autoPlay: true,
+        autoPlayInterval: Duration(minutes: slideMinutes),
+        viewportFraction: 1.0,
+        height: double.infinity,
       ),
-      child: CarouselSlider(
-        options: CarouselOptions(
-          autoPlay: true,
-          autoPlayInterval: Duration(minutes: slideMinutes),
-          viewportFraction: 1.0,
-          height: double.infinity,
-        ),
-        items: slides,
-      ),
+      items: slides,
     );
   }
 
@@ -346,17 +338,46 @@ class _DefaultViewState extends State<DefaultView> {
 // ── Helper: Carousel slide with AnimatedSwitcher ──────────────────────────────
 class _CarouselSlide extends StatelessWidget {
   final Widget child;
+  final String? backgroundUrl;
 
-  const _CarouselSlide({super.key, required this.child});
+  const _CarouselSlide({
+    super.key,
+    required this.child,
+    this.backgroundUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20), // Adjusted
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 600),
-          child: SingleChildScrollView(key: key, child: child),
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+    // Fallback logic for background
+    String bgPath = backgroundUrl ?? '';
+    if (bgPath.isEmpty || bgPath == '-') {
+      bgPath = dataProvider.config.backgroundUrl;
+    }
+    if (bgPath.isEmpty || bgPath == '-') {
+      bgPath = AppConstants.defaultBackgroundPath;
+    }
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: bgPath.startsWith('http')
+              ? NetworkImage(bgPath) as ImageProvider
+              : AssetImage(bgPath),
+          fit: BoxFit.cover,
+          colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            child: SingleChildScrollView(key: key, child: child),
+          ),
         ),
       ),
     );

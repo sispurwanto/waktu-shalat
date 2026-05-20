@@ -31,80 +31,100 @@ class AppConstants {
       "dalil": "QS Al Baqoroh 255",
       "isi":
           "Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya)...",
+      "url_slide":
+          "https://firebasestorage.googleapis.com/v0/b/masjid-digital-4a48a.appspot.com/o/slide_masjid%2Fd1296816-7836-470d-ae67-318434a1de2d_Al-Baqarah%20255.png?alt=media&token=d8fc36e8-8ab1-4c3d-8b8f-d76f95d47854",
     },
     {
       "id": "2",
       "dalil": "QS Al Baqoroh 256",
       "isi":
           "Tidak ada paksaan untuk (memasuki) agama (Islam); sesungguhnya telah jelas jalan yang benar daripada jalan yang sesat...",
+      "url_slide": "",
     },
     {
       "id": "3",
       "dalil": "QS Al Baqoroh 257",
       "isi":
           "Allah Pelindung orang-orang yang beriman; Dia mengeluarkan mereka dari kegelapan (kekafiran) kepada cahaya (iman)...",
+      "url_slide": "",
     },
     {
       "id": "4",
       "dalil": "QS Al-Ankabut: 45",
       "isi":
           "Sesungguhnya shalat itu mencegah dari perbuatan keji dan mungkar.",
+      "url_slide": "",
     },
     {
       "id": "5",
       "dalil": "QS. An-Nisa: 103",
       "isi":
           "Sesungguhnya shalat adalah kewajiban yang ditentukan waktunya atas orang-orang yang beriman.",
+      "url_slide": "",
     },
     {
       "id": "6",
       "dalil": "QS. Al-Mu'minun: 1–2",
       "isi": "Beruntunglah orang-orang yang khusyuk dalam shalatnya.",
+      "url_slide": "",
     },
     {
       "id": "7",
       "dalil": "QS. Al-Baqarah: 153",
       "isi":
           "Dan mintalah pertolongan kepadaNya dengan sabar dan shalat, sesungguhnya Allah beserta orang-orang yang sabar",
+      "url_slide": "",
     },
     {
       "id": "8",
       "dalil": "QS. Ar-Ra'd: 28",
       "isi": "Dengan mengingat Allah hati menjadi tenteram.",
+      "url_slide": "",
     },
     {
       "id": "9",
       "dalil": "QS. Al-Ma'un: 4–5",
       "isi": "Maka celakalah orang-orang yang lalai dari shalatnya",
+      "url_slide": "",
     },
     {
       "id": "10",
       "dalil": "HR. Ahmad",
       "isi": "Jagalah shalat lima waktu, karena ia tiang agama.",
+      "url_slide": "",
     },
     {
       "id": "11",
       "dalil": "HR. Tirmidzi",
       "isi":
           "Barang siapa meninggalkan shalat dengan sengaja, maka ia telah kafir.",
+      "url_slide": "",
     },
     {
       "id": "12",
       "dalil": "HR. Al-Baihaqi",
       "isi": "Shalatlah sebelum dishalatkan.",
+      "url_slide": "",
     },
     {
       "id": "13",
       "dalil": "HR. Bukhari",
       "isi":
           "Dekatkanlah diri kalian kepada Allah dengan amal yang paling dicintai-Nya, yaitu shalat.",
+      "url_slide": "",
     },
     {
       "id": "14",
       "dalil": "HR. Muslim",
       "isi": "Antara seorang hamba dan kekafiran adalah meninggalkan shalat.",
+      "url_slide": "",
     },
-    {"id": "15", "dalil": "HR. Muslim", "isi": "Shalat adalah cahaya."},
+    {
+      "id": "15",
+      "dalil": "HR. Muslim",
+      "isi": "Shalat adalah cahaya.",
+      "url_slide": "",
+    },
   ];
 
   // --- Data Informasi Masjid Default ---
@@ -113,17 +133,20 @@ class AppConstants {
       "id": "1",
       "title": "Kajian Rutin",
       "content": "Setiap ahad pagi ba'da subuh",
+      "url_slide": "",
     },
     {
       "id": "2",
       "title": "Laporan Keuangan",
       "content": "Saldo kas saat ini: Rp 0.00",
+      "url_slide": "",
     },
     {
       "id": "3",
       "title": "Kerja Bakti",
       "content":
           "Hari minggu depan ada kerja bakti membersihkan lingkungan masjid",
+      "url_slide": "",
     },
     {
       "id": "4",
@@ -131,12 +154,14 @@ class AppConstants {
           "Ustadz Abu Ukasyah Dindin Kurniawan - Adab Dan Akhlak Penuntut Ilmu",
       "content":
           "Setiap Ahad Ba'da Shalat Subuh - selesai pekan ke-1 dan ke-4, Karya Ustadz Yazid bin Abdul Qadir Jawas",
+      "url_slide": "",
     },
     {
       "id": "5",
       "title": "Ustadz Abu Arika Jamiludin, Lc. - Sifat Shalat Nabi",
       "content":
           "Kajian Rutin Setiap Kamis Ba'da Maghrib - Selesai pekan ke-1 dan ke-3, Karya Syaikh Al-Albani",
+      "url_slide": "",
     },
     {
       "id": "6",
@@ -144,6 +169,7 @@ class AppConstants {
           "Ustadz Wukir Saputro, Lc. M.Pd - Aqidah (Penjabaran Asmaul Husna)",
       "content":
           "Setiap Sabtu Ba'da Shalat Maghrib - selesai pekan ke-2 dan ke-4",
+      "url_slide": "",
     },
     {
       "id": "7",
@@ -151,21 +177,25 @@ class AppConstants {
           "Ustadz Muhammad Alpen Hidayatullah Lc. - Al Bidayah Fi Al-Aqidah",
       "content":
           "Setiap Senin Ba'da Shalat Maghrib - selesai, Karya Syaikh Muhammad bin Shalih Al Utsaimin",
+      "url_slide": "",
     },
     {
       "id": "8",
       "title": "Ustadz Ahmad Munawar, S.Pd Hafidzahullah - Kajian Bahasa Arab",
       "content": "Setiap Sabtu Ba'da Subuh - selesai",
+      "url_slide": "",
     },
     {
       "id": "9",
       "title": "Ustadzah Linda - Asmaul Husna (Al Akhir) Ummahat",
       "content": "Setiap Ahad Pukul 08.30 - 10.30 pekan ke-2 dan ke-4",
+      "url_slide": "",
     },
     {
       "id": "10",
       "title": "Ustadzah Lisa - Kajian Tahsin Al-Qur'an Ummahat",
       "content": "Setiap Rabu pukul 09.00 - menjelang shalat Dzuhur",
+      "url_slide": "",
     },
   ];
 }
