@@ -163,36 +163,43 @@ class _DefaultViewState extends State<DefaultView> {
     // Slide 1: Nasehat
     if (dataProvider.advices.isNotEmpty) {
       final advice = dataProvider.advices[adviceIdx];
+      final showText = advice.isi.isNotEmpty && advice.isi != '-';
+      final showDalil = advice.dalil.isNotEmpty && advice.dalil != '-';
+
       slides.add(
         _CarouselSlide(
           key: ValueKey('advice_$adviceIdx'),
           backgroundUrl: advice.urlSlide,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                advice.isi,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 32, // Further reduced
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white,
-                  height: 1.4,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '— ${advice.dalil}',
-                style: const TextStyle(
-                  fontSize: 22, // Further reduced
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+          child: (showText || showDalil)
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (showText)
+                      Text(
+                        advice.isi,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 32, // Further reduced
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white,
+                          height: 1.4,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    if (showText && showDalil) const SizedBox(height: 16),
+                    if (showDalil)
+                      Text(
+                        '— ${advice.dalil}',
+                        style: const TextStyle(
+                          fontSize: 22, // Further reduced
+                          color: Colors.amber,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
       );
     }
@@ -200,35 +207,42 @@ class _DefaultViewState extends State<DefaultView> {
     // Slide 2: Info Masjid
     if (dataProvider.mosqueInfos.isNotEmpty) {
       final info = dataProvider.mosqueInfos[infoIdx];
+      final showTitle = info.title.isNotEmpty && info.title != '-';
+      final showContent = info.content.isNotEmpty && info.content != '-';
+
       slides.add(
         _CarouselSlide(
           key: ValueKey('info_$infoIdx'),
           backgroundUrl: info.urlSlide,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                info.title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 42, // Further reduced
-                  fontWeight: FontWeight.w900,
-                  color: Colors.amber,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                info.content,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 30, // Further reduced
-                  color: Colors.white,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
+          child: (showTitle || showContent)
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (showTitle)
+                      Text(
+                        info.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 42, // Further reduced
+                          fontWeight: FontWeight.w900,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    if (showTitle && showContent) const SizedBox(height: 16),
+                    if (showContent)
+                      Text(
+                        info.content,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 30, // Further reduced
+                          color: Colors.white,
+                          height: 1.3,
+                        ),
+                      ),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
       );
     }
@@ -350,37 +364,95 @@ class _CarouselSlide extends StatelessWidget {
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
-    // Fallback logic for background
-    String bgPath = backgroundUrl ?? '';
-    if (bgPath.isEmpty || bgPath == '-') {
-      bgPath = dataProvider.config.backgroundUrl;
-    }
-    if (bgPath.isEmpty || bgPath == '-') {
-      bgPath = AppConstants.defaultBackgroundPath;
+    // Determine if this is a custom background slide specifically for this item
+    final String bgPath;
+    final bool isCustomSlide;
+
+    if (backgroundUrl != null &&
+        backgroundUrl!.isNotEmpty &&
+        backgroundUrl != '-') {
+      bgPath = backgroundUrl!;
+      isCustomSlide = true;
+    } else {
+      isCustomSlide = false;
+      String globalBg = dataProvider.config.backgroundUrl;
+      if (globalBg.isEmpty || globalBg == '-') {
+        bgPath = AppConstants.defaultBackgroundPath;
+      } else {
+        bgPath = globalBg;
+      }
     }
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: bgPath.startsWith('http')
-              ? NetworkImage(bgPath) as ImageProvider
-              : AssetImage(bgPath),
-          fit: BoxFit.cover,
-          colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
-        ),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 600),
-            child: SingleChildScrollView(key: key, child: child),
-          ),
-        ),
+    // Always get the global background path for the underlying wallpaper
+    String globalBgPath = dataProvider.config.backgroundUrl;
+    if (globalBgPath.isEmpty || globalBgPath == '-') {
+      globalBgPath = AppConstants.defaultBackgroundPath;
+    }
+
+    final backgroundDecoration = BoxDecoration(
+      image: DecorationImage(
+        image: globalBgPath.startsWith('http')
+            ? NetworkImage(globalBgPath) as ImageProvider
+            : AssetImage(globalBgPath),
+        fit: BoxFit.cover,
+        colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.darken),
       ),
     );
+
+    if (isCustomSlide) {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: backgroundDecoration,
+        child: Stack(
+          children: [
+            // The custom slide image displayed fully in its original aspect ratio (BoxFit.contain)
+            Positioned.fill(
+              child: Image(
+                image: bgPath.startsWith('http')
+                    ? NetworkImage(bgPath) as ImageProvider
+                    : AssetImage(bgPath),
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Icon(
+                      Icons.broken_image,
+                      color: Colors.white24,
+                      size: 64,
+                    ),
+                  );
+                },
+              ),
+            ),
+            // The overlay text/content on top of the image
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 600),
+                  child: SingleChildScrollView(key: key, child: child),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: backgroundDecoration,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 600),
+              child: SingleChildScrollView(key: key, child: child),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 
