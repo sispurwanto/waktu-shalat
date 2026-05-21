@@ -394,11 +394,13 @@ class _ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8), // Reduced from 10
-      width: isNext ? 120 : 100, // Reduced from 130/110
-      decoration: BoxDecoration(
+    return Expanded(
+      flex: isNext ? 12 : 10,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BoxDecoration(
         color: isNext ? Colors.amber[400] : const Color(0xFF144D3E),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
@@ -421,7 +423,7 @@ class _ScheduleItem extends StatelessWidget {
           Text(
             name,
             style: TextStyle(
-              fontSize: isNext ? 18 : 14, // Reduced from 20/16
+              fontSize: isNext ? 24 : 18,
               fontWeight: FontWeight.bold,
               color: isNext ? Colors.black : Colors.white,
             ),
@@ -430,13 +432,14 @@ class _ScheduleItem extends StatelessWidget {
           Text(
             time,
             style: TextStyle(
-              fontSize: isNext ? 22 : 18, // Reduced from 24/20
+              fontSize: isNext ? 36 : 28,
               fontWeight: FontWeight.w600,
               color: isNext ? Colors.black : Colors.green[100],
             ),
           ),
         ],
       ),
+    ),
     );
   }
 }
