@@ -31,8 +31,7 @@ class AppConstants {
       "dalil": "QS Al Baqoroh 255",
       "isi":
           "Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya)...",
-      "url_slide":
-          "https://firebasestorage.googleapis.com/v0/b/masjid-digital-4a48a.appspot.com/o/slide_masjid%2Fd1296816-7836-470d-ae67-318434a1de2d_Al-Baqarah%20255.png?alt=media&token=d8fc36e8-8ab1-4c3d-8b8f-d76f95d47854",
+      "url_slide":"",
     },
     {
       "id": "2",
