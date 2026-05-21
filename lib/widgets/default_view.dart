@@ -406,13 +406,13 @@ class _CarouselSlide extends StatelessWidget {
         decoration: backgroundDecoration,
         child: Stack(
           children: [
-            // The custom slide image displayed fully in its original aspect ratio (BoxFit.contain)
+            // The custom slide image stretched to fill the area fully (BoxFit.fill)
             Positioned.fill(
               child: Image(
                 image: bgPath.startsWith('http')
                     ? NetworkImage(bgPath) as ImageProvider
                     : AssetImage(bgPath),
-                fit: BoxFit.contain,
+                fit: BoxFit.fill,
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
                     child: Icon(
